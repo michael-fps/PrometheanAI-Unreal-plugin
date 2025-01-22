@@ -23,6 +23,9 @@ UWorld* GetEditorWorld();
 // --- Transform Functions
 // --------------------------------------------------------------------
 
+//--- FPS Begin-End: michael@ 2025/01/21 - moving earlier in header to handle inline template functions
+FRotator FRotatorFromXYZVec(FVector RotationVec);
+
 void TransformActorsByName(const TArray<FString>& ObjectNames, FTransform Transform, UWorld* World);
 void TransformActorByName(FString ObjectName, FTransform Transform, UWorld* World);
 
@@ -158,8 +161,29 @@ FString addStaticMeshActors(UWorld* World, FString JsonString);
 
 TArray<AStaticMeshActor*> addStaticMeshActorOnSelection(FString MeshPath, UWorld* World);  // TODO: THIS MOST LIKELY NEEDS FIXING. - why though? :) 
 TArray<AStaticMeshActor*> addStaticMeshActorsOnSelection(TArray<FString> MeshPaths, UWorld* World);
+
+//--- FPS Begin: michael@ 2025/01/21 - moving into header for remplate generation on usage to avoid linker errors
 template<class ActorType>
-ActorType* AddActorToWorld(UWorld* World, const FString& Name, const FVector& Location, const FVector& RotationVec = FVector::ZeroVector, const FVector& Scale = FVector::OneVector);
+ActorType* AddActorToWorld(UWorld* World, const FString& Name, const FVector& Location, const FVector& RotationVec = FVector::ZeroVector, const FVector& Scale = FVector::OneVector)
+{
+	FRotator Rotation = FRotatorFromXYZVec(RotationVec);
+	FActorSpawnParameters SpawnInfo; //	SpawnInfo.Name = FName(*Name);  // didn't seem to work well. deletes the object with original name from scene
+	                                 //but doesn't assign the name %/
+	auto obj = World->SpawnActor<ActorType>(ActorType::StaticClass(), Location, Rotation, SpawnInfo);
+
+	obj->SetActorScale3D(Scale);
+	if (Name != "")
+	{
+		auto unique_name =
+			MakeUniqueObjectName(obj->GetOuter(), obj->GetClass(), *Name).ToString(); // obj->GetOuter() is important. was crashing with just obj
+		obj->Rename(*unique_name);                                                    // hangs indefinitely when trying to use additioanl parameters
+		obj->SetActorLabel(obj->GetName());
+	}
+	GEditor->SelectActor(obj, true, false); // add to selection, first true is important
+	return obj;
+}
+//--- FPS End: michael@ 2025/01/21 - moving into header for remplate generation on usage to avoid linker errors
+
 AStaticMeshActor* addStaticMeshActor(UWorld* World, FString MeshPath, FString Name = "", FVector Location = FVector(0, 0, 0), FVector RotationVec = FVector(0, 0, 0), FVector Scale = FVector(1, 1, 1)); // Could probably be replaced by templated version above, AddActorToWorld(..).
 AStaticMeshActor* addEmptyStaticMeshActor(UWorld* World, FString Name = "", FVector Location = FVector(0, 0, 0), FVector RotationVec = FVector(0, 0, 0), FVector Scale = FVector(1, 1, 1)); // Could probably be replaced by templated version above, AddActorToWorld(..).
 
@@ -215,8 +239,29 @@ FString getSceneName(UWorld* World);
 FString GetAssetBrowserSelection();
 void SetAssetBrowserSelection(const TArray<UObject*>& SelectedObjects);
 FString getJSONAssetDataFromAssetBrowserSelection();
-template<class AssetType>
-FString GetJSONImportSourceDataFromAsset(const FString& AssetPath);
+FString getJSONAssetDataFromAssetPaths(TArray<FString> AssetReferencePaths);
+
+//--- FPS Begin: michael@ 2025/01/21 - moving into header for remplate generation on usage to avoid linker errors
+template <class AssetType>
+FString GetJSONImportSourceDataFromAsset(const FString& AssetPath)
+{
+	auto Asset = LoadObject<AssetType>(nullptr, *AssetPath, nullptr);
+	FString SourcePaths;
+	if (Asset != nullptr)
+	{
+		for (auto& SourceFile : Asset->AssetImportData->SourceData.SourceFiles)
+		{
+			if (SourcePaths.Len() > 0)
+			{
+				SourcePaths += ' ';
+			}
+			SourcePaths += SourceFile.RelativeFilename;
+		}
+	}
+	return SourcePaths;
+}
+//--- FPS End: michael@ 2025/01/21 - moving into header for remplate generation on usage to avoid linker errors
+
 void EditAsset(FString AssetReferencePath);
 void FindAsset(FString AssetReferencePath);
 void FindAssets(TArray<FString> AssetReferencePaths);
@@ -301,8 +346,6 @@ TArray<FString> ActorArrayToNamesArray(const TArray<AActor*>& Actors);
 TArray<FString> ActorArrayToAssetPathsArray(const TArray<AActor*>& Actors);
 TArray<FVector> ActorArrayToLocationsArray(TArray<AActor*> Actors);
 TArray<FVector> ActorArrayToPivotArray(TArray<AActor*> Actors);
-
-FRotator FRotatorFromXYZVec(FVector RotationVec);
 
 bool ParseJsonString(const FString& String, TSharedPtr<FJsonObject>& Result);
 

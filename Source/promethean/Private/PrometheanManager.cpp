@@ -295,6 +295,8 @@ void ExecuteTCPCommand(FString MetaCommandStr)
 	}
 
 	// Cache all hidden actors in the world to be ignored during raytracing
+//--- FPS Begin-End: michael@ 2025/01/21 - removing code block that does not compile or seem to affect anything. HiddenActors is not a global or local var here but also appears unused
+#if 0 
 	// TODO: is this slow?
 	HiddenActors.Empty();
     for (TActorIterator<AActor> It(EditorWorld); It; ++It)
@@ -306,6 +308,7 @@ void ExecuteTCPCommand(FString MetaCommandStr)
         }
     }
     UE_LOG(LogPromethean, Warning, TEXT("Number of Hidden Actors: %d"), HiddenActors.Num());
+#endif
 
 	GEditor->BeginTransaction(FText::FromString("PrometheanAI Command"));  // start undo, automatically detecs add and deletions, property updates need to be registered with ActorPtr->Modify()
 	

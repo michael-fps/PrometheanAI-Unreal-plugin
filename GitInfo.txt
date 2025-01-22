@@ -1,0 +1,4 @@
+This plug-in tracks https://github.com/PrometheanAI/PrometheanAI-Unreal-plugin.git 
+Latest merge was from main commit https://github.com/PrometheanAI/PrometheanAI-Unreal-plugin/commit/6b90b96cd7d6d1e84afcdb885bbee525504d890b
+Mods are tagged with //--- FPS Begin style
+.uplugin is updated to use correct major and minor format vs version format

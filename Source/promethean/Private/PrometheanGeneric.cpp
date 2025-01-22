@@ -1109,16 +1109,13 @@ TArray<FString> GetMaterialPathsFromValidActor(AActor* Actor)
 TArray<UMaterialFunctionInterface*> GetMaterialFunctionDependencies(const UMaterial& Material)
 {
 	TArray<UMaterialFunctionInterface*> OutArray;
-	// TODO - fix 4.25 support
-	/*
-	for (auto& FunctionInfo : Material.MaterialFunctionInfos)
-	{
-		OutArray.Add(FunctionInfo.Function);
-	}
-	*/
+	//--- FPS Begin-End: michael@ 2025/01/21 - fix for UE5.x material functions
+	Material.GetDependentFunctions(OutArray);
 	return OutArray;
 }
 
+//--- FPS Begin-End: michael@ 2025/01/21 - moving into header for remplate generation on usage to avoid linker errors
+#if 0
 template<class AssetType>
 FString GetJSONImportSourceDataFromAsset(const FString& AssetPath)
 {
@@ -1137,6 +1134,7 @@ FString GetJSONImportSourceDataFromAsset(const FString& AssetPath)
 	}
 	return SourcePaths;
 }
+#endif
 
 // generic
 
@@ -1737,6 +1735,8 @@ TArray<AStaticMeshActor*> addStaticMeshActorsOnSelection(TArray<FString> MeshPat
 	return NewActors;
 }
 
+//--- FPS Begin-End: michael@ 2025/01/21 - moving into header for remplate generation on usage to avoid linker errors
+#if 0
 template<class ActorType>
 ActorType* AddActorToWorld(UWorld* World, const FString& Name, const FVector& Location, const FVector& RotationVec, const FVector& Scale) {
 	FRotator Rotation = FRotatorFromXYZVec(RotationVec);
@@ -1753,7 +1753,7 @@ ActorType* AddActorToWorld(UWorld* World, const FString& Name, const FVector& Lo
 	GEditor->SelectActor(obj, true, false);  // add to selection, first true is important
 	return obj;
 }
-
+#endif
 
 AActor* addBlueprintActor(UWorld* World, FString MeshPath, FString Name, FVector Location, FVector RotationVec, FVector Scale)
 {	
