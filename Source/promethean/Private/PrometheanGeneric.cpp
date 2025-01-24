@@ -1153,8 +1153,8 @@ void CreateMaterialInstancesFromJsonString(const FString& JsonString)
 	{
 		auto ParentPath = JsonItem.Key;
 		auto MaterialJsonObject = JsonItem.Value->AsObject();
-		auto TargetPath = MaterialJsonObject->GetStringField("target");
-		auto MaterialAttrs = MaterialJsonObject->GetObjectField("attributes");
+		auto TargetPath = MaterialJsonObject->GetStringField(TEXT("target"));
+		auto MaterialAttrs = MaterialJsonObject->GetObjectField(TEXT("attributes"));
 
 		if (ParentPath.IsEmpty() || TargetPath.IsEmpty())
 		{
@@ -1533,13 +1533,13 @@ FString addStaticMeshActors(UWorld* World, FString JsonString)
 		int num_objs = InJsonObjects->Values.GetKeys(ObjectNames);
 		for (FString JsonObjectName : ObjectNames)  // iterate over dictionary key-value pairs andcreate variables
 		{			
-			bool IsGroup = InJsonObjects->GetObjectField(JsonObjectName)->GetBoolField("group");			
-			FString Name = InJsonObjects->GetObjectField(JsonObjectName)->GetStringField("name");			
-			FString MeshPath = InJsonObjects->GetObjectField(JsonObjectName)->GetStringField("asset_path");
+			bool IsGroup = InJsonObjects->GetObjectField(JsonObjectName)->GetBoolField(TEXT("group"));			
+			FString Name = InJsonObjects->GetObjectField(JsonObjectName)->GetStringField(TEXT("name"));
+			FString MeshPath = InJsonObjects->GetObjectField(JsonObjectName)->GetStringField(TEXT("asset_path"));
 
 			// --- LOCATION
 			FVector Location;
-			TArray<TSharedPtr<FJsonValue>> LocationArray = InJsonObjects->GetObjectField(JsonObjectName)->GetArrayField("location");
+			TArray<TSharedPtr<FJsonValue>> LocationArray = InJsonObjects->GetObjectField(JsonObjectName)->GetArrayField(TEXT("location"));
 			if (LocationArray.Num() > 2)
 			{
 				Location = FVector(LocationArray[0]->AsNumber(), LocationArray[1]->AsNumber(), LocationArray[2]->AsNumber());
@@ -1551,7 +1551,7 @@ FString addStaticMeshActors(UWorld* World, FString JsonString)
 
 			// --- ROTATION
 			FVector RotationVec;
-			TArray<TSharedPtr<FJsonValue>> RotationArray = InJsonObjects->GetObjectField(JsonObjectName)->GetArrayField("rotation");
+			TArray<TSharedPtr<FJsonValue>> RotationArray = InJsonObjects->GetObjectField(JsonObjectName)->GetArrayField(TEXT("rotation"));
 			if (RotationArray.Num() > 2)
 			{
 				RotationVec = FVector(RotationArray[0]->AsNumber(), RotationArray[1]->AsNumber(), RotationArray[2]->AsNumber());
@@ -1563,7 +1563,7 @@ FString addStaticMeshActors(UWorld* World, FString JsonString)
 
 			// --- SCALE
 			FVector Scale;
-			TArray<TSharedPtr<FJsonValue>> ScaleArray = InJsonObjects->GetObjectField(JsonObjectName)->GetArrayField("scale");
+			TArray<TSharedPtr<FJsonValue>> ScaleArray = InJsonObjects->GetObjectField(JsonObjectName)->GetArrayField(TEXT("scale"));
 			if (ScaleArray.Num() > 2)
 			{
 				Scale = FVector(ScaleArray[0]->AsNumber(), ScaleArray[1]->AsNumber(), ScaleArray[2]->AsNumber());
@@ -1573,7 +1573,7 @@ FString addStaticMeshActors(UWorld* World, FString JsonString)
 				Scale = FVector::ZeroVector;
 			}
 			// -- RAYTRACE - check if we need to raytrace to update the location and rotation
-			float RaytraceDistance = InJsonObjects->GetObjectField(JsonObjectName)->GetNumberField("raytrace_distance");
+			float RaytraceDistance = InJsonObjects->GetObjectField(JsonObjectName)->GetNumberField(TEXT("raytrace_distance"));
 			if (RaytraceDistance)
 			{
 				FVector RayDirection = FVector(0.0, 0.0, RaytraceDistance); //  * 0.5;  // half it to offset up and down				
@@ -1586,8 +1586,8 @@ FString addStaticMeshActors(UWorld* World, FString JsonString)
 					Location.Z += FMath::FRandRange(0.0, 0.25); // fix Z-fighting for flat surfaces by offseting them ever so slightly
 					
 					// - if we had a location hit check if we need to update orientatio ntoo
-					float RaytraceAlignment = InJsonObjects->GetObjectField(JsonObjectName)->GetNumberField("raytrace_alignment");					
-					float RaytraceAlignmentMask = InJsonObjects->GetObjectField(JsonObjectName)->GetNumberField("raytrace_alignment_mask");					
+					float RaytraceAlignment = InJsonObjects->GetObjectField(JsonObjectName)->GetNumberField(TEXT("raytrace_alignment"));
+					float RaytraceAlignmentMask = InJsonObjects->GetObjectField(JsonObjectName)->GetNumberField(TEXT("raytrace_alignment_mask"));
 					if (RaytraceAlignment || RaytraceAlignmentMask)
 					{
 						float UpDotProduct = FVector::DotProduct(FVector(0, 0, 1), TraceResult.Normal);						
@@ -1648,7 +1648,7 @@ FString addStaticMeshActors(UWorld* World, FString JsonString)
 			// parent new object if parent was specified
 			if (CreatedActor != nullptr)
 			{
-				FString ParentName = InJsonObjects->GetObjectField(JsonObjectName)->GetStringField("parent_dcc_name");
+				FString ParentName = InJsonObjects->GetObjectField(JsonObjectName)->GetStringField(TEXT("parent_dcc_name"));
 				if (ParentName.Len() > 0)
 				{
 					ParentObjectsByName(ParentName, CreatedActor->GetName(), World);

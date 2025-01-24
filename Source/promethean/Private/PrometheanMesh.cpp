@@ -118,7 +118,7 @@ FString APrometheanMeshActor::GenerateMeshes(const FString& JsonInputString) {
 			UE_LOG(LogPromethean, Display, TEXT("Add Objects from geometry original DCC name: %s"), *OriginalDCCName);
 			
 			// if no name found, use default one
-			auto Name = ObjectJsonDict->GetStringField("Name");
+			auto Name = ObjectJsonDict->GetStringField(TEXT("Name"));
 			if (Name.IsEmpty())
 			{
 				Name = "PrometheanMeshActor";
@@ -126,13 +126,13 @@ FString APrometheanMeshActor::GenerateMeshes(const FString& JsonInputString) {
 
 			// Get actual values from json.
 			auto Obj = AddActorToWorld<APrometheanMeshActor>(GEditor->GetEditorWorldContext().World(), Name, FVector(0.0f, 0.0f, 0.0f));
-			auto TriangleIDs = ObjectJsonDict->GetArrayField("tri_ids");
-			auto Verts = ObjectJsonDict->GetArrayField("verts");
-			auto Normals = ObjectJsonDict->GetArrayField("normals");
-			auto UVs = ObjectJsonDict->GetArrayField("uvs");
-			auto Tangents = ObjectJsonDict->GetArrayField("tangents");
-			auto VColors = ObjectJsonDict->GetArrayField("vcolors");
-			auto Material = ObjectJsonDict->GetStringField("material");
+			auto TriangleIDs = ObjectJsonDict->GetArrayField(TEXT("tri_ids"));
+			auto Verts = ObjectJsonDict->GetArrayField(TEXT("verts"));
+			auto Normals = ObjectJsonDict->GetArrayField(TEXT("normals"));
+			auto UVs = ObjectJsonDict->GetArrayField(TEXT("uvs"));
+			auto Tangents = ObjectJsonDict->GetArrayField(TEXT("tangents"));
+			auto VColors = ObjectJsonDict->GetArrayField(TEXT("vcolors"));
+			auto Material = ObjectJsonDict->GetStringField(TEXT("material"));
 
 			// Throw error if triangle indices or vertex locations are missing in the json string
 			if (TriangleIDs.Num() <= 0)
